@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(split)
         self.bridge.progress.connect(lambda p: self.progress.setValue(int(p * 100)))
         self._refresh_accounts()
+        self._append_log(f"Flow ProVip phiên bản {__version__} — thư mục: {Path(__file__).resolve().parents[2]}")
 
     # ================================================================== Tài khoản
     def _accounts_tab(self) -> QWidget:
@@ -92,8 +93,8 @@ class MainWindow(QMainWindow):
         lay.addLayout(_row(*buttons, "stretch"))
         lay.addWidget(self.acc_table)
         lay.addWidget(QLabel(
-            "Mỗi tài khoản là một profile trình duyệt riêng. Bấm “Đăng nhập”, đăng nhập Google trong cửa sổ "
-            "hiện ra, mở được Flow thì đóng cửa sổ. Tool không lưu mật khẩu."))
+            "Bấm “Đăng nhập” → đăng nhập Google → trên trang Flow bấm nút đăng nhập/“Create with Flow” cho tới "
+            "khi thấy ô nhập prompt. Tool tự nhận ra và tự đóng cửa sổ. Tool không lưu mật khẩu."))
         return w
 
     def _refresh_accounts(self) -> None:

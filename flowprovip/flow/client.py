@@ -91,6 +91,7 @@ class FlowSession:
             viewport={"width": 1280, "height": 800},
             args=["--disable-blink-features=AutomationControlled"],
             ignore_default_args=["--enable-automation"],
+            chromium_sandbox=True,
         )
         if self.account.proxy:
             kwargs["proxy"] = _parse_proxy(self.account.proxy)

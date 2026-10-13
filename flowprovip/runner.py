@@ -42,7 +42,7 @@ async def login_account(bg: BackgroundLoop, account: Account, settings: Settings
     pw = await bg.playwright()
     s = FlowSession(account, settings, pw)
     await s.start(headless=False)
-    await s.page.goto("https://accounts.google.com/ServiceLogin?continue=" + ep.FLOW_URL)
+    await s.open_flow()  # Flow tự chuyển sang trang đăng nhập Google nếu chưa đăng nhập
     log(f"[{account.name}] Đăng nhập Google trong cửa sổ vừa mở, vào được Flow thì ĐÓNG cửa sổ.")
     closed = asyncio.Event()
     s.context.on("close", lambda *_: closed.set())

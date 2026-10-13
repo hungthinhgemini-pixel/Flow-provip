@@ -38,18 +38,31 @@ class BackgroundLoop:
 
 async def login_account(bg: BackgroundLoop, account: Account, settings: Settings,
                         log: Callable[[str], None]) -> dict:
-    """Mở cửa sổ trình duyệt để người dùng tự đăng nhập Google, chờ tới khi đóng cửa sổ."""
+    """Mở trình duyệt cho người dùng đăng nhập; tự phát hiện đăng nhập xong rồi tự đóng cửa sổ."""
     pw = await bg.playwright()
     s = FlowSession(account, settings, pw)
     await s.start(headless=False)
-    await s.open_flow()  # Flow tự chuyển sang trang đăng nhập Google nếu chưa đăng nhập
-    log(f"[{account.name}] Đăng nhập Google trong cửa sổ vừa mở, vào được Flow thì ĐÓNG cửa sổ.")
+    await s.open_flow()
+    log(f"[{account.name}] Đã mở trình duyệt: hãy đăng nhập Google. Tool sẽ tự nhận biết khi xong.")
     closed = asyncio.Event()
     s.context.on("close", lambda *_: closed.set())
-    await closed.wait()
-    s.context = None
-    # mở lại ẩn để kiểm tra phiên
-    return await check_account(bg, account, settings)
+    result = {"ok": False, "error": "Cửa sổ đã đóng trước khi đăng nhập xong"}
+    for _ in range(600):  # tối đa ~20 phút
+        if closed.is_set() or not s.context.pages:
+            break
+        try:
+            if await s._refresh_token(force=True):
+                result = {"ok": True, "email": account.email}
+                break
+        except Exception:  # noqa: BLE001 - chưa đăng nhập, đợi tiếp
+            pass
+        await asyncio.sleep(2)
+    account.status = "ok" if result["ok"] else "chưa đăng nhập"
+    if result["ok"]:
+        log(f"[{account.name}] Đăng nhập thành công: {account.email or 'ok'}")
+        await asyncio.sleep(2)  # để Chrome kịp ghi cookie vào profile
+    await s.close()
+    return result
 
 
 async def check_account(bg: BackgroundLoop, account: Account, settings: Settings) -> dict:

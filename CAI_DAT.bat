@@ -32,9 +32,10 @@ if errorlevel 1 (
 )
 
 echo [3/4] Dang cai thu vien (mat vai phut, dung tat cua so)...
-%PY% -m venv .venv
+if exist "C:\fpv" rmdir /s /q "C:\fpv"
+%PY% -m venv C:\fpv
 if errorlevel 1 ( echo LOI tao moi truong. & pause & exit /b 1 )
-call .venv\Scripts\activate.bat
+call C:\fpv\Scripts\activate.bat
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 if errorlevel 1 ( echo LOI cai thu vien. Chup man hinh gui cho nguoi ho tro. & pause & exit /b 1 )

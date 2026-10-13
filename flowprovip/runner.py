@@ -47,15 +47,20 @@ async def login_account(bg: BackgroundLoop, account: Account, settings: Settings
     closed = asyncio.Event()
     s.context.on("close", lambda *_: closed.set())
     result = {"ok": False, "error": "Cửa sổ đã đóng trước khi đăng nhập xong"}
-    for _ in range(600):  # tối đa ~20 phút
+    for n in range(600):  # tối đa ~20 phút
         if closed.is_set() or not s.context.pages:
             break
         try:
             if await s._refresh_token(force=True):
                 result = {"ok": True, "email": account.email}
                 break
-        except Exception:  # noqa: BLE001 - chưa đăng nhập, đợi tiếp
-            pass
+        except Exception as e:  # noqa: BLE001 - chưa đăng nhập, đợi tiếp
+            if n % 5 == 0:
+                try:
+                    url = s.context.pages[0].url[:80]
+                except Exception:  # noqa: BLE001
+                    url = "?"
+                log(f"[{account.name}] chưa nhận ra đăng nhập Flow ({str(e)[:90]}) | trang hiện tại: {url}")
         await asyncio.sleep(2)
     account.status = "ok" if result["ok"] else "chưa đăng nhập"
     if result["ok"]:

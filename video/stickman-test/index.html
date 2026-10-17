@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #120a24; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      svg#scene { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+      .cap { position: absolute; left: 0; width: 1920px; text-align: center; color: #fff;
+        text-transform: uppercase; font-weight: 900; -webkit-text-stroke: 10px #000;
+        paint-order: stroke fill; letter-spacing: 2px; opacity: 0; }
+      #cap1, #cap2 { bottom: 70px; font-size: 76px; }
+      #how { top: 0px; font-size: 230px; }
+      #big { top: 40px; font-size: 100px; line-height: 1.15; -webkit-text-stroke: 12px #000; }
+      #big .y { color: #ffd23f; }
+      #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+      #vignette { position: absolute; inset: 0; opacity: 0;
+        background: radial-gradient(circle at 42% 38%, rgba(0,0,0,0) 18%, rgba(0,0,0,0.78) 100%); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="12" data-width="1920" data-height="1080">
+
+      <svg id="scene" class="clip" data-start="0" data-duration="12" data-track-index="0"
+           viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1b1147" />
+            <stop offset="0.45" stop-color="#6a2b83" />
+            <stop offset="0.78" stop-color="#e8683c" />
+            <stop offset="1" stop-color="#ffb347" />
+          </linearGradient>
+          <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#fff2b0" stop-opacity="1" />
+            <stop offset="0.25" stop-color="#ffc766" stop-opacity="0.8" />
+            <stop offset="1" stop-color="#ff7a3c" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <g id="cam">
+          <!-- sky + sun -->
+          <rect x="-300" y="-200" width="2520" height="1500" fill="url(#sky)" />
+          <circle id="sunGlowC" cx="1330" cy="700" r="520" fill="url(#sunGlow)" />
+          <circle cx="1330" cy="700" r="120" fill="#fff3c4" />
+
+          <!-- far skyline (slow parallax) -->
+          <g id="farLayer" fill="#5b2c7c">
+            <polygon points="-300,820 -300,640 -180,640 -180,560 -80,560 -80,700 60,700 60,600 200,600 200,720 330,720 330,540 430,540 430,680 560,680 560,760 700,760 700,620 820,620 820,700 960,700 960,580 1080,580 1080,730 1220,730 1220,650 1340,650 1340,760 1500,760 1500,610 1620,610 1620,700 1760,700 1760,560 1880,560 1880,720 2020,720 2020,820" />
+          </g>
+          <!-- mid skyline -->
+          <g id="midLayer" fill="#43215f">
+            <polygon points="-300,900 -300,720 -120,720 -120,640 40,640 40,760 220,760 220,690 380,690 380,800 560,800 560,700 740,700 740,790 920,790 920,660 1100,660 1100,780 1280,780 1280,710 1460,710 1460,800 1640,800 1640,680 1820,680 1820,770 2020,770 2020,900" />
+          </g>
+          <!-- crowd silhouettes far left/right -->
+          <g id="crowd" fill="#0b0618">
+            <g transform="translate(130 830)"><circle cx="0" cy="-150" r="22" /><rect x="-18" y="-125" width="36" height="85" rx="12" /><rect x="-16" y="-45" width="12" height="45" /><rect x="4" y="-45" width="12" height="45" /></g>
+            <g transform="translate(215 840) scale(0.9)"><circle cx="0" cy="-150" r="22" /><rect x="-18" y="-125" width="36" height="85" rx="12" /><rect x="-16" y="-45" width="12" height="45" /><rect x="4" y="-45" width="12" height="45" /></g>
+            <g transform="translate(1620 835)"><circle cx="0" cy="-150" r="22" /><rect x="-18" y="-125" width="36" height="85" rx="12" /><rect x="-16" y="-45" width="12" height="45" /><rect x="4" y="-45" width="12" height="45" /></g>
+            <g transform="translate(1710 845) scale(0.92)"><circle cx="0" cy="-150" r="22" /><rect x="-18" y="-125" width="36" height="85" rx="12" /><rect x="-16" y="-45" width="12" height="45" /><rect x="4" y="-45" width="12" height="45" /></g>
+          </g>
+          <!-- ground -->
+          <rect x="-300" y="820" width="2520" height="400" fill="#8a3d5e" />
+          <rect x="-300" y="820" width="2520" height="12" fill="#c8654a" />
+
+          <!-- STICKMAN (feet at 0,0) -->
+          <g id="man">
+            <g id="legL"><line x1="0" y1="0" x2="0" y2="200" /></g>
+            <g id="legR"><line x1="0" y1="0" x2="0" y2="200" /></g>
+            <rect id="torso" x="-48" y="-390" width="96" height="190" rx="26" fill="#d6322e" stroke="#000" stroke-width="10" />
+            <g id="armL">
+              <line x1="0" y1="0" x2="0" y2="90" />
+              <g id="foreL"><line x1="0" y1="0" x2="0" y2="90" /><circle cx="0" cy="96" r="12" fill="#000" stroke="none" /></g>
+            </g>
+            <g id="armR">
+              <line x1="0" y1="0" x2="0" y2="90" />
+              <g id="foreR"><line x1="0" y1="0" x2="0" y2="90" /><circle id="handR" cx="0" cy="96" r="12" fill="#000" stroke="none" /></g>
+            </g>
+            <g id="head">
+              <circle cx="0" cy="0" r="68" fill="#000" />
+              <circle id="eyeL" cx="-24" cy="-6" r="10" fill="#fff" />
+              <circle id="eyeR" cx="24" cy="-6" r="10" fill="#fff" />
+              <path id="mouth" d="M -18 28 Q 0 38 18 28" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" />
+            </g>
+          </g>
+
+          <!-- FLY -->
+          <g id="fly">
+            <g id="trail" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0">
+              <line x1="-30" y1="0" x2="-150" y2="0" />
+              <line x1="-26" y1="-16" x2="-110" y2="-16" />
+              <line x1="-26" y1="16" x2="-120" y2="16" />
+            </g>
+            <ellipse id="wingA" cx="-5" cy="-20" rx="19" ry="30" fill="#fff" fill-opacity="0.85" stroke="#000" stroke-width="3" />
+            <ellipse id="wingB" cx="10" cy="-20" rx="19" ry="30" fill="#fff" fill-opacity="0.85" stroke="#000" stroke-width="3" />
+            <ellipse cx="0" cy="0" rx="34" ry="20" fill="#000" />
+            <circle cx="26" cy="-3" r="14" fill="#000" />
+          </g>
+
+          <!-- focus ring on the catch -->
+          <circle id="focus" cx="835" cy="288" r="0" fill="none" stroke="#fff" stroke-width="10" />
+        </g>
+      </svg>
+
+      <div id="vignette" class="clip" data-start="0" data-duration="12" data-track-index="1"></div>
+      <div id="flash" class="clip" data-start="0" data-duration="12" data-track-index="2"></div>
+
+      <div id="cap1" class="cap clip" data-start="0.4" data-duration="2.3" data-track-index="3">A fly buzzes past your face.</div>
+      <div id="cap2" class="cap clip" data-start="3.2" data-duration="1.4" data-track-index="3">You just catch it.</div>
+      <div id="how" class="cap clip" data-start="4.7" data-duration="1.3" data-track-index="3">HOW?</div>
+      <div id="big" class="cap clip" data-start="6.1" data-duration="5.5" data-track-index="3">
+        What if your reaction time<br />was <span class="y">10&times; faster?</span>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ---- styling for all stick limbs
+      gsap.set("#man line", { attr: { stroke: "#000", "stroke-width": 16, "stroke-linecap": "round" } });
+
+      // ---- rig pose (rest)
+      gsap.set("#man", { x: 700, y: 820 });
+      gsap.set("#legL", { x: -22, y: -200, rotation: 3 });
+      gsap.set("#legR", { x: 22, y: -200, rotation: -3 });
+      gsap.set("#torso", { y: 0 });
+      gsap.set("#armL", { x: -50, y: -366, rotation: 8 });
+      gsap.set("#foreL", { x: 0, y: 90, rotation: -6 });
+      gsap.set("#armR", { x: 50, y: -366, rotation: -8 });
+      gsap.set("#foreR", { x: 0, y: 90, rotation: 6 });
+      gsap.set("#head", { x: 0, y: -462 });
+      gsap.set("#fly", { x: -200, y: 260, scale: 1 });
+
+      // camera origin
+      gsap.set("#cam", { svgOrigin: "760 430" });
+
+      // ---- breathing idle (finite, seek-safe)
+      tl.to("#man", { y: 826, duration: 0.8, repeat: 3, yoyo: true, ease: "sine.inOut" }, 0);
+      tl.to("#head", { rotation: -4, duration: 0.8, repeat: 3, yoyo: true, ease: "sine.inOut" }, 0);
+
+      // ---- slow camera push + parallax
+      tl.fromTo("#cam", { scale: 1 }, { scale: 1.06, duration: 3.0, ease: "sine.inOut" }, 0);
+      tl.fromTo("#farLayer", { x: 0 }, { x: -30, duration: 12, ease: "none" }, 0);
+      tl.fromTo("#midLayer", { x: 0 }, { x: -70, duration: 12, ease: "none" }, 0);
+      tl.fromTo("#sunGlowC", { attr: { r: 500 } }, { attr: { r: 560 }, duration: 3, repeat: 3, yoyo: true, ease: "sine.inOut" }, 0);
+
+      // ---- caption 1
+      tl.fromTo("#cap1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.4);
+      tl.to("#cap1", { opacity: 0, duration: 0.25 }, 2.45);
+
+      // ---- fly wings flap
+      tl.to("#wingA", { scaleY: 0.2, transformOrigin: "50% 100%", duration: 0.035, repeat: 70, yoyo: true, ease: "none" }, 1.5);
+      tl.to("#wingB", { scaleY: 0.25, transformOrigin: "50% 100%", duration: 0.04, repeat: 62, yoyo: true, ease: "none" }, 1.5);
+
+      // ---- fly flight path (enters from left, circles near face, ends at catch point)
+      tl.to("#fly", {
+        keyframes: [
+          { x: 250,  y: 330, duration: 0.5,  ease: "power2.in" },
+          { x: 560,  y: 300, duration: 0.4,  ease: "none" },
+          { x: 640,  y: 360, duration: 0.2,  ease: "none" },
+          { x: 860,  y: 330, duration: 0.18, ease: "none" },
+          { x: 770,  y: 262, duration: 0.15, ease: "none" },
+          { x: 835,  y: 288, duration: 0.12, ease: "none" }
+        ]
+      }, 1.5);
+      tl.to("#trail", { opacity: 1, duration: 0.12 }, 1.55);
+      tl.to("#trail", { opacity: 0, duration: 0.25 }, 2.55);
+
+      // ---- eyes follow the fly (head turns)
+      tl.to("#eyeL", { x: 7, duration: 0.5 }, 1.9);
+      tl.to("#eyeR", { x: 7, duration: 0.5 }, 1.9);
+
+      // ---- the catch: arm snaps up at 2.95
+      tl.to("#armR", { rotation: -153, duration: 0.12, ease: "power4.out" }, 2.95);
+      tl.to("#foreR", { rotation: 0, duration: 0.12, ease: "power4.out" }, 2.95);
+      tl.to("#torso", { rotation: -3, transformOrigin: "50% 100%", duration: 0.12, ease: "power3.out" }, 2.95);
+
+      // flash + punch-in + freeze vignette
+      tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.95, duration: 0.05, ease: "none" }, 3.07);
+      tl.to("#flash", { opacity: 0, duration: 0.25, ease: "power2.out" }, 3.12);
+      tl.to("#cam", { scale: 1.2, duration: 0.18, ease: "power3.out" }, 3.07);
+      tl.to("#vignette", { opacity: 1, duration: 0.25 }, 3.1);
+      tl.fromTo("#focus", { attr: { r: 260 }, opacity: 0 }, { attr: { r: 90 }, opacity: 1, duration: 0.3, ease: "power3.out" }, 3.1);
+      tl.to("#focus", { opacity: 0, duration: 0.3 }, 4.2);
+
+      // caption 2
+      tl.fromTo("#cap2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 3.25);
+      tl.to("#cap2", { opacity: 0, duration: 0.25 }, 4.35);
+
+      // release freeze, camera settles
+      tl.to("#vignette", { opacity: 0, duration: 0.4 }, 4.4);
+      tl.to("#cam", { scale: 1.08, duration: 0.6, ease: "power2.inOut" }, 4.4);
+
+      // HOW? punch
+      tl.fromTo("#how", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)" }, 4.75);
+      tl.to("#how", { x: 8, duration: 0.05, repeat: 9, yoyo: true, ease: "none" }, 5.1);
+      tl.to("#how", { opacity: 0, duration: 0.2 }, 5.8);
+
+      // big question
+      tl.fromTo("#big", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 6.15);
+      tl.to("#cam", { scale: 1.14, duration: 5, ease: "sine.inOut" }, 6.1);
+      tl.to("#big", { opacity: 0, duration: 0.4 }, 11.4);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

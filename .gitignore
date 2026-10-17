@@ -8,3 +8,10 @@ output/
 .pytest_cache/
 dist/
 build/
+
+# HyperFrames test project: keep source, ignore renders and tool-generated files
+video/**/renders/
+video/**/.hyperframes/
+video/**/AGENTS.md
+video/**/CLAUDE.md
+video/**/node_modules/
